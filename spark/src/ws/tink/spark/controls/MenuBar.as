@@ -438,7 +438,7 @@ package ws.tink.spark.controls
 		 *  @param dispatchChangeEvent if true, the component will dispatch a "change" event if the
 		 *  value has changed. Otherwise, it will dispatch a "valueCommit" event. 
 		 */
-		override mx_internal function setSelectedIndex(value:int, dispatchChangeEvent:Boolean = false):void
+		override mx_internal function setSelectedIndex( value:int, dispatchChangeEvent:Boolean = false, changeCaret:Boolean = true ):void
 		{
 			var changed:Boolean;
 			if( !_proposedSelectedIndices && !_selectedIndices && value > -1 )
@@ -484,17 +484,17 @@ package ws.tink.spark.controls
 					if( dispatchChangeEvent )
 					{
 						
-						dispatchEvent(new IndexChangeEvent(IndexChangeEvent.CHANGE, false, false, selectedIndex, selectedIndex));
+						dispatchEvent(new IndexChangeEvent (IndexChangeEvent.CHANGE, false, false, selectedIndex, selectedIndex ) );
 					}
 					else
 					{
-						dispatchEvent(new FlexEvent(FlexEvent.VALUE_COMMIT));
+						dispatchEvent( new FlexEvent( FlexEvent.VALUE_COMMIT ) );
 					}
 				}
 			}
 			else
 			{
-				super.setSelectedIndex( value, dispatchChangeEvent );
+				super.setSelectedIndex( value, dispatchChangeEvent, changeCaret );
 			}
 		}
 		
