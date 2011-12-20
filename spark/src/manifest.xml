@@ -8,8 +8,6 @@
 	<component id="FormItem" class="ws.tink.spark.containers.FormItem"/>
 	<component id="Navigator" class="ws.tink.spark.containers.Navigator"/>
 	<component id="NavigatorGroup" class="ws.tink.spark.containers.NavigatorGroup"/>
-	<component id="ValidationForm" class="ws.tink.spark.containers.ValidationForm"/>
-	<component id="ValidationFormItem" class="ws.tink.spark.containers.ValidationFormItem"/>
 	
 	<!-- controls -->
 	<component id="Alert" class="ws.tink.spark.controls.Alert"/>
@@ -25,7 +23,6 @@
 	<component id="RadioButtonBar" class="ws.tink.spark.controls.RadioButtonBar"/>
 	<component id="InlineScroller" class="ws.tink.spark.controls.InlineScroller"/>
 	<component id="TimedTextInput" class="ws.tink.spark.controls.TimedTextInput"/>
-	<component id="ValidityVScrollBar" class="ws.tink.spark.controls.ValidityVScrollBar"/>
     
     <!-- graphics -->
 	<component id="SolidColorDash" class="ws.tink.spark.graphics.SolidColorDash"/>
@@ -37,7 +34,6 @@
 	<component id="MenuBarItemRenderer" class="ws.tink.spark.itemRenderers.MenuBarItemRenderer"/>
 	<component id="PropertyItemRenderer" class="ws.tink.spark.itemRenderers.PropertyItemRenderer"/>
 	<component id="RadioButtonItemRenderer" class="ws.tink.spark.itemRenderers.RadioButtonItemRenderer"/>
-	<component id="ValidityItemRenderer" class="ws.tink.spark.itemRenderers.ValidityItemRenderer"/>
 	
 	<!-- layouts -->
 	<component id="AccordionLayout" class="ws.tink.spark.layouts.AccordionLayout"/>
