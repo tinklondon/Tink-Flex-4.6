@@ -22,20 +22,17 @@ package ws.tink.spark.layouts
 	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
 	
-	import mx.containers.TileDirection;
 	import mx.core.ILayoutElement;
 	import mx.core.ISelectableList;
 	import mx.core.IVisualElement;
 	import mx.core.mx_internal;
-	import mx.events.MoveEvent;
 	
 	import spark.components.supportClasses.ButtonBarBase;
 	import spark.components.supportClasses.GroupBase;
 	import spark.effects.animation.Animation;
-	import spark.layouts.HorizontalAlign;
-	import spark.layouts.VerticalAlign;
 	
 	import ws.tink.spark.layouts.supportClasses.AnimationNavigatorLayoutBase;
+	import ws.tink.spark.layouts.supportClasses.LayoutAxis;
 
 	use namespace mx_internal;
 	
@@ -202,7 +199,7 @@ package ws.tink.spark.layouts
 		 *  @private
 		 *  Storage property for direction.
 		 */
-		private var _direction:String = TileDirection.VERTICAL;
+		private var _direction:String = LayoutAxis.VERTICAL;
 		
 		[Inspectable(category="General", enumeration="vertical,horizontal", defaultValue="vertical")]
 		
@@ -660,7 +657,7 @@ package ws.tink.spark.layouts
 					if( !element ) continue;
 					if( matrix ) element.setLayoutMatrix( matrix, true );
 					
-					if( direction == TileDirection.VERTICAL  )
+					if( direction == LayoutAxis.VERTICAL  )
 					{
 						size = element.getPreferredBoundsHeight();
 						if( i < numElements - 1 ) size--;
@@ -681,13 +678,13 @@ package ws.tink.spark.layouts
 			var h:Number = 0;
 			switch( direction )
 			{
-				case  TileDirection.VERTICAL :
+				case  LayoutAxis.VERTICAL :
 				{
 					if( minElementSize ) h += minElementSize * ( numElementsInLayout - 1 );
 					if( _buttonBar ) h += _buttonLayout._totalSize;
 					break;
 				}
-				case  TileDirection.HORIZONTAL :
+				case  LayoutAxis.HORIZONTAL :
 				{
 					if( minElementSize ) w += minElementSize * ( numElementsInLayout - 1 );
 					if( _buttonBar ) w += _buttonLayout._totalSize;
@@ -776,14 +773,12 @@ package ws.tink.spark.layouts
 			var elementPos:Number = 0;
 			const offsetMultiplier:Number = 1 - animationValue;
 			const numElements:int = _elementSizes.length;
-			
-			
 			for( var i:int = 0; i < numElements; i++ )
 			{
 				if( _buttonLayout._buttonSizes.length > i )
 				{
 					element = _buttonLayout.target.getElementAt( i );
-					if( direction == TileDirection.VERTICAL )
+					if( direction == LayoutAxis.VERTICAL )
 					{
 						element.setLayoutBoundsPosition( 0, elementPos );
 					}
@@ -798,13 +793,14 @@ package ws.tink.spark.layouts
 				prevSize = elementSize.size;
 				elementSize.size = elementSize.start + ( elementSize.diff * offsetMultiplier );
 				
-				if( elementSize.elementChanged && elementSize.element )
+				if( elementSize.elementChanged )
 				{
-					if( direction == TileDirection.VERTICAL )
+					if( direction == LayoutAxis.VERTICAL )
 					{
 						if( _useScrollRect && elementSize.element is DisplayObject )
 						{
 							DisplayObject( elementSize.element ).scrollRect = new Rectangle( 0, 0, unscaledWidth, elementSize.size );
+							
 							elementSize.element.setLayoutBoundsSize( unscaledWidth, unscaledHeight - _buttonLayout._totalSize );
 						}
 						else
@@ -878,7 +874,7 @@ package ws.tink.spark.layouts
 				// If we are creating a new elementSize, we must make sure that this element
 				// is actually added (i.e. not worry about being virtual as it's already created).
 				const indicesCreated:Vector.<int> = new Vector.<int>();
-				const size:Number = direction == TileDirection.VERTICAL ? unscaledHeight : unscaledWidth;
+				const size:Number = direction == LayoutAxis.VERTICAL ? unscaledHeight : unscaledWidth;
 				const selectedSize:Number = size - _buttonLayout._totalSize - ( minElementSize * ( numElementsInLayout - 1 ) );
 				
 				// Store a reference to the indices that we need ElementSize items for.
@@ -932,14 +928,7 @@ package ws.tink.spark.layouts
 						
 						// Only get the virtual element if it is the selectedIndex,
 						// its start size is bigger than 0, or its diff in size is bigger than 0.
-						if( elementSize.displayListIndex == selectedIndex || elementSize.start || elementSize.diff )
-						{
-							elementSize.element = target.getVirtualElementAt( elementSize.displayListIndex );
-						}
-						else
-						{
-							elementSize.element = null;
-						}
+						if( elementSize.displayListIndex == selectedIndex || elementSize.start || elementSize.diff ) elementSize.element = target.getVirtualElementAt( elementSize.displayListIndex );
 						
 						update( elementSize, selectedSize, creatingAll );
 					}
@@ -959,7 +948,10 @@ package ws.tink.spark.layouts
 					// Only get the virtual element if it is the selectedIndex,
 					// its start size is bigger than 0.
 					if( elementSize.displayListIndex == selectedIndex || elementSize.start || 
-					indicesCreated.indexOf( elementSize.displayListIndex ) != -1 ) elementSize.element = target.getVirtualElementAt( elementSize.displayListIndex );
+					indicesCreated.indexOf( elementSize.displayListIndex ) != -1 )
+					{
+						elementSize.element = target.getVirtualElementAt( elementSize.displayListIndex );
+					}
 					
 					_elementSizes.push( elementSize );
 					
@@ -980,7 +972,6 @@ package ws.tink.spark.layouts
 					if( selectedIndex == elementSize.layoutIndex || elementSize.size ) elementSize.element = target.getVirtualElementAt( elementSize.displayListIndex );
 				}
 			}
-			
 		}
 		
 		
@@ -1008,7 +999,7 @@ package ws.tink.spark.layouts
 			{
 				var indicesRequiredIndex:int;
 				
-				const size:Number = direction == TileDirection.VERTICAL ? unscaledHeight : unscaledWidth;
+				const size:Number = direction == LayoutAxis.VERTICAL ? unscaledHeight : unscaledWidth;
 				const selectedSize:Number = size - _buttonLayout._totalSize - ( minElementSize * ( numElementsInLayout - 1 ) );
 				
 				// Store a reference to the indices that we need ElementSize items for.
@@ -1104,7 +1095,6 @@ package ws.tink.spark.layouts
 }
 import flash.geom.Matrix;
 
-import mx.containers.TileDirection;
 import mx.core.ILayoutElement;
 import mx.core.IVisualElement;
 
@@ -1112,6 +1102,7 @@ import spark.components.supportClasses.GroupBase;
 import spark.layouts.supportClasses.LayoutBase;
 
 import ws.tink.spark.layouts.AccordionLayout;
+import ws.tink.spark.layouts.supportClasses.LayoutAxis;
 
 
 internal class ElementSize
@@ -1295,7 +1286,6 @@ internal class MeasuredCache
 
 	public function cache( elt:ILayoutElement ):void
 	{
-		if( !elt ) return;
 		var preferred:Number;
 		var min:Number;
 		
@@ -1360,7 +1350,7 @@ internal class ButtonLayout extends LayoutBase
 			
 			if( matrix ) element.setLayoutMatrix( matrix, true );
 			
-			if( _parentLayout.direction == TileDirection.VERTICAL  )
+			if( _parentLayout.direction == LayoutAxis.VERTICAL  )
 			{
 				
 				s = Math.max( s, element.getPreferredBoundsWidth() );
@@ -1372,7 +1362,7 @@ internal class ButtonLayout extends LayoutBase
 			
 		}
 		
-		if( _parentLayout.direction == TileDirection.VERTICAL  )
+		if( _parentLayout.direction == LayoutAxis.VERTICAL  )
 		{
 			target.measuredWidth = target.measuredMinWidth = s;
 			target.measuredHeight = _parentLayout.target.measuredHeight;
@@ -1427,7 +1417,7 @@ internal class ButtonLayout extends LayoutBase
 			
 			if( matrix ) element.setLayoutMatrix( matrix, true );
 			
-			if( _parentLayout.direction == TileDirection.VERTICAL  )
+			if( _parentLayout.direction == LayoutAxis.VERTICAL  )
 			{
 				element.setLayoutBoundsSize( unscaledWidth, element.getPreferredBoundsHeight() );
 			}
