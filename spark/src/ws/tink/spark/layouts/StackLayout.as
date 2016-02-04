@@ -19,6 +19,7 @@ SOFTWARE.
 package ws.tink.spark.layouts
 {
 	import flash.display.BitmapData;
+	import flash.display.IBitmapDrawable;
 	import flash.events.Event;
 	import flash.geom.Matrix3D;
 	import flash.geom.Point;
@@ -40,8 +41,11 @@ package ws.tink.spark.layouts
 	import spark.layouts.HorizontalAlign;
 	import spark.layouts.VerticalAlign;
 	import spark.layouts.supportClasses.LayoutBase;
+	import spark.primitives.Rect;
 	import spark.utils.BitmapUtil;
 	
+	import ws.tink.spark.effects.stackEffects.StackEffect;
+	import ws.tink.spark.effects.stackEffects.effectInstances.StackEffectInstance;
 	import ws.tink.spark.layouts.supportClasses.NavigatorLayoutBase;
 
 	use namespace mx_internal;
@@ -156,12 +160,12 @@ package ws.tink.spark.layouts
 		/**
 		 *  @private
 		 */		
-		public var effect			: IEffect;
+		public var effect			: StackEffect;
 		
 		/**
 		 *  @private
 		 */
-		private var _effectInstance		: EffectInstance;
+		private var _effectInstance		: StackEffectInstance;
 		
 		/**
 		 *  @private
@@ -374,17 +378,17 @@ package ws.tink.spark.layouts
 			{
 				if( effect && _stackIndex >= 0 )
 				{
+					// I want to to show here, hide the current view.
 					target.validateNow();
 					
-					_bitmapTo = BitmapUtil.getSnapshot(IUIComponent(target));
+					_bitmapTo = new BitmapData( unscaledWidth, unscaledHeight, true, 0x00ffffff );//BitmapUtil.getSnapshot(IUIComponent(target));
+					_bitmapTo.draw( target );
 					
 					Object( effect ).bitmapTo = _bitmapTo;
 					Object( effect ).bitmapFrom = _bitmapFrom;
-					_effectInstance = EffectInstance( effect.play( [ target ] )[ 0 ] );
-					_effectInstance.addEventListener( EffectEvent.EFFECT_END, onEffectEnd, false, 0, true );
 					
-					Object( effect ).bitmapTo = null;
-					Object( effect ).bitmapFrom = null;
+					_effectInstance = StackEffectInstance( effect.play( [ target ] )[ 0 ] );
+					_effectInstance.addEventListener( EffectEvent.EFFECT_END, onEffectEnd, false, 0, true );
 				}
 				
 				_stackIndex = selectedIndex;
@@ -618,15 +622,6 @@ package ws.tink.spark.layouts
 			_bitmapFrom.dispose();
 		}
 		
-//		override protected function scrollPositionChanged() : void
-//		{
-//			super.scrollPositionChanged();
-//			
-//			if( !target ) return;
-//			
-//			
-//		}
-		
 		/**
 		 *  @private
 		 */
@@ -636,15 +631,26 @@ package ws.tink.spark.layouts
 			
 			if( effect && selectedIndex >= 0 )
 			{
+				const bitmapFrom:BitmapData = new BitmapData( unscaledWidth, unscaledHeight, true, 0x00000000 );
+				
 				try
 				{
-					_bitmapFrom = BitmapUtil.getSnapshot(IUIComponent(target));
+					if( effect.isPlaying )
+					{
+						bitmapFrom.draw( effect.display );
+						effect.stop();
+					}
+					else
+					{
+						bitmapFrom.draw( target );
+					}
 				}
 				catch( e:Error )
 				{
-					_bitmapFrom = new BitmapData( 30, 30, false, 0x000000 );
-					
+					bitmapFrom.fillRect( bitmapFrom.rect, 0xff000000 );
 				}
+				
+				_bitmapFrom = bitmapFrom;
 			}
 			
 			super.invalidateSelectedIndex( index, offset );
