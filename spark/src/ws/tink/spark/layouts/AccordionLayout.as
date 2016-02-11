@@ -33,7 +33,7 @@ package ws.tink.spark.layouts
 	
 	import ws.tink.spark.layouts.supportClasses.AnimationNavigatorLayoutBase;
 	import ws.tink.spark.layouts.supportClasses.LayoutAxis;
-
+	
 	use namespace mx_internal;
 	
 	/**
@@ -80,6 +80,7 @@ package ws.tink.spark.layouts
 	 */
 	public class AccordionLayout extends AnimationNavigatorLayoutBase
 	{
+		
 		
 		
 		//--------------------------------------------------------------------------
@@ -147,6 +148,36 @@ package ws.tink.spark.layouts
 		//  Properties
 		//
 		//--------------------------------------------------------------------------
+		
+		/**
+		 *  The storage property is in the NavigatorLayoutBase.
+		 */
+		
+		/** 
+		 *  Indicates that the layout can have a <code>selectedIndex</code>
+		 *  and no <code>selectItem</code>
+		 *  
+		 *  @default false
+		 *  
+		 *  @langversion 3.0
+		 *  @playerversion Flash 10
+		 *  @playerversion AIR 1.5
+		 *  @productversion Flex 4
+		 */
+		public function get allowDeselection():Boolean
+		{ 
+			return _allowDeselection;
+		}
+		/**
+		 *  @private
+		 */
+		public function set allowDeselection( value:Boolean ):void
+		{
+			if (_allowDeselection == value)
+				return;
+			_allowDeselection = value;
+		}
+		
 		
 		//----------------------------------
 		//  buttonRotation
@@ -520,7 +551,7 @@ package ws.tink.spark.layouts
 		override public function set target(value:GroupBase):void
 		{
 			if( target == value ) return;
-
+			
 			super.target = value;
 			
 			if( _buttonBar && target is ISelectableList ) _buttonBar.dataProvider = ISelectableList( target );
@@ -584,7 +615,7 @@ package ws.tink.spark.layouts
 				// If we are resizing due to an index change we want to animate,
 				// if its not due to an index change we do not want to animate.
 				if( !animationValue ) clearVirtualLayoutCache();
-					
+				
 				_elementSizesInvalid = true;
 				_buttonLayout.invalidateTargetDisplayList();
 				if( _buttonBar && target )
@@ -605,7 +636,7 @@ package ws.tink.spark.layouts
 		override public function measure():void
 		{
 			super.measure();
-
+			
 			if( !target ) return;
 			
 			if( !indicesInLayout || !indicesInLayout.length )
@@ -646,7 +677,7 @@ package ws.tink.spark.layouts
 				var matrix:Matrix = new Matrix();
 				var rotation:Number = buttonRotation == "none" ? 0 : buttonRotation == "left" ? -90 : 90;
 				if( rotation ) matrix.rotate( rotation * ( Math.PI / 180 ) );
-
+				
 				var size:Number;
 				const numElements:int = target.numElements;
 				var s:Number = 0;
@@ -905,9 +936,12 @@ package ws.tink.spark.layouts
 					// Also add this as an index that is required.
 					indicesRequired = indicesCreated.concat();
 					
-					// Make sure we always push the selectedIndex
-					var selected:int = indicesInLayout[ selectedIndex ];
-					if( indicesRequired.indexOf( selected ) == -1 ) indicesRequired.push( selected );
+					if( selectedIndex != -1 )
+					{
+						// Make sure we always push the selectedIndex
+						var selected:int = indicesInLayout[ selectedIndex ];
+						if( indicesRequired.indexOf( selected ) == -1 ) indicesRequired.push( selected );
+					}
 				}
 				
 				
@@ -921,7 +955,7 @@ package ws.tink.spark.layouts
 					{
 						_elementSizes.splice( i, 1 );
 					}
-					// Update ElementSize items.
+						// Update ElementSize items.
 					else
 					{
 						if( indicesRequiredIndex != -1 ) indicesRequired.splice( indicesRequiredIndex, 1 )
@@ -948,7 +982,7 @@ package ws.tink.spark.layouts
 					// Only get the virtual element if it is the selectedIndex,
 					// its start size is bigger than 0.
 					if( elementSize.displayListIndex == selectedIndex || elementSize.start || 
-					indicesCreated.indexOf( elementSize.displayListIndex ) != -1 )
+						indicesCreated.indexOf( elementSize.displayListIndex ) != -1 )
 					{
 						elementSize.element = target.getVirtualElementAt( elementSize.displayListIndex );
 					}
@@ -987,7 +1021,7 @@ package ws.tink.spark.layouts
 		override protected function updateDisplayListReal():void
 		{
 			super.updateDisplayListReal();
-
+			
 			if( !indicesInLayout.length ) return;
 			
 			var i:int;
@@ -1090,8 +1124,8 @@ package ws.tink.spark.layouts
 			
 			if( element is DisplayObject ) DisplayObject( element ).scrollRect = null;
 		}
-        
-    }
+		
+	}
 }
 import flash.geom.Matrix;
 
@@ -1148,7 +1182,7 @@ internal class ElementSize
 		
 		if( ( _size + value > 0 ) && _element ) _elementChanged = true;
 		_size = value;
-//		if( _size ) _elementChanged = true;
+		//		if( _size ) _elementChanged = true;
 	}
 	
 	private var _elementChanged:Boolean;
@@ -1283,7 +1317,7 @@ internal class MeasuredCache
 	{
 		return _measuredMinHeight;
 	}
-
+	
 	public function cache( elt:ILayoutElement ):void
 	{
 		var preferred:Number;
@@ -1339,7 +1373,7 @@ internal class ButtonLayout extends LayoutBase
 			matrix = new Matrix();
 			matrix.rotate( _rotation * ( Math.PI / 180 ) );
 		}
-
+		
 		var element:IVisualElement;
 		var size:Number;
 		const numElements:int = target.numElements;
@@ -1408,7 +1442,7 @@ internal class ButtonLayout extends LayoutBase
 			matrix = new Matrix();
 			matrix.rotate( _rotation * ( Math.PI / 180 ) );
 		}
-			
+		
 		var element:IVisualElement;
 		const numElements:int = target.numElements;
 		for( var i:int = 0; i < numElements; i++ )
