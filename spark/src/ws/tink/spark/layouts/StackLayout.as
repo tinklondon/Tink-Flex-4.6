@@ -47,7 +47,7 @@ package ws.tink.spark.layouts
 	import ws.tink.spark.effects.StackEffect;
 	import ws.tink.spark.effects.effectInstances.StackEffectInstance;
 	import ws.tink.spark.layouts.supportClasses.NavigatorLayoutBase;
-
+	
 	use namespace mx_internal;
 	
 	/**
@@ -156,7 +156,7 @@ package ws.tink.spark.layouts
 		 *  @private
 		 */
 		private var _stackIndex		: int = -2;
-
+		
 		/**
 		 *  @private
 		 */		
@@ -194,6 +194,36 @@ package ws.tink.spark.layouts
 		//  Properties
 		//
 		//--------------------------------------------------------------------------
+		
+		/**
+		 *  The storage property is in the NavigatorLayoutBase.
+		 */
+		
+		/** 
+		 *  Indicates that the layout can have a <code>selectedIndex</code>
+		 *  and no <code>selectItem</code>
+		 *  
+		 *  @default false
+		 *  
+		 *  @langversion 3.0
+		 *  @playerversion Flash 10
+		 *  @playerversion AIR 1.5
+		 *  @productversion Flex 4
+		 */
+		public function get allowDeselection():Boolean
+		{ 
+			return _allowDeselection;
+		}
+		/**
+		 *  @private
+		 */
+		public function set allowDeselection( value:Boolean ):void
+		{
+			if (_allowDeselection == value)
+				return;
+			_allowDeselection = value;
+		}
+		
 		
 		//----------------------------------
 		//  verticalAlign
@@ -376,7 +406,7 @@ package ws.tink.spark.layouts
 			
 			if( _stackIndex != selectedIndex )
 			{
-				if( effect && _stackIndex >= 0 )
+				if( effect && _bitmapFrom )
 				{
 					// I want to to show here, hide the current view.
 					target.validateNow();
@@ -629,7 +659,7 @@ package ws.tink.spark.layouts
 		{
 			if( selectedIndex == index ) return;
 			
-			if( effect && selectedIndex >= 0 )
+			if( effect && !isNaN( unscaledWidth ) && !isNaN( unscaledHeight ) )
 			{
 				const bitmapFrom:BitmapData = new BitmapData( unscaledWidth, unscaledHeight, true, 0x00000000 );
 				
@@ -655,7 +685,7 @@ package ws.tink.spark.layouts
 			
 			super.invalidateSelectedIndex( index, offset );
 		}
-
+		
 		/**
 		 *  @private
 		 */
@@ -673,8 +703,8 @@ package ws.tink.spark.layouts
 			}
 		}
 		
-        
-    }
+		
+	}
 }
 
 
@@ -709,5 +739,5 @@ class ElementMaxDimensions
 		return _height;
 	}
 	
-
+	
 }
