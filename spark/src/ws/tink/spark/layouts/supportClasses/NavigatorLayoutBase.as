@@ -115,12 +115,18 @@ package ws.tink.spark.layouts.supportClasses
 		}	
 		
 		
-		
 		//--------------------------------------------------------------------------
 		//
 		//  Variables
 		//
 		//--------------------------------------------------------------------------
+		
+		/**
+		 *  @private
+		 *	Flag to indicate the layout can have no selected item.
+		 *  This can be updated in sub classes.
+		 */
+		protected var _allowDeselection:Boolean = false;
 		
 		/**
 		 *  @private
@@ -256,8 +262,8 @@ package ws.tink.spark.layouts.supportClasses
 //			
 //			invalidateTargetDisplayList();
 //		}
-		
-		
+
+
 		//----------------------------------
 		//  selectedIndexOffset
 		//---------------------------------- 
@@ -344,7 +350,7 @@ package ws.tink.spark.layouts.supportClasses
 		 */
 		public function get selectedIndex():int
 		{
-			return _proposedSelectedIndex == -1 ? _selectedIndex : _proposedSelectedIndex;
+			return _proposedSelectedIndex == -2 ? _selectedIndex : _proposedSelectedIndex;
 		}
 		/**
 		 *  @private
@@ -712,7 +718,7 @@ package ws.tink.spark.layouts.supportClasses
 			// a) the number of elements have changed
 			// b) includeLayout has changed on an element
 			// updateElementsInLayout();
-
+			
 			// TODO This was move to measure, but if the target has an explicit size
 			// measure isn't invoked, so checking it here too.
 			// If fired in measure this should no longer get invoked due to
@@ -733,7 +739,7 @@ package ws.tink.spark.layouts.supportClasses
 				_proposedSelectedIndex = -1;
 //				_proposedSelectedIndexOffset = 0;
 			}
-			else if( selectedIndex == -1 )
+			else if( !_allowDeselection && selectedIndex == -1 )
 			{
 				_selectedIndexInvalid = true;
 				_proposedSelectedIndex = 0;
@@ -775,7 +781,7 @@ package ws.tink.spark.layouts.supportClasses
 			{
 				_selectedIndexInvalid = false;
 				_selectedIndex = numElementsInLayout ? _proposedSelectedIndex % numElementsInLayout : _proposedSelectedIndex;
-				_proposedSelectedIndex = -1;
+				_proposedSelectedIndex = -2;
 				
 //				updateSelectedIndex( _proposedSelectedIndex, _proposedSelectedIndexOffset );
 //				updateSelectedIndex( _proposedSelectedIndex, 0 );
@@ -791,6 +797,10 @@ package ws.tink.spark.layouts.supportClasses
 				{
 					_selectedElement = target ? target.getElementAt( selectedIndex ) : null;
 				}
+			}
+			else
+			{
+				_selectedElement = null;
 			}
 			
 			updateDisplayListBetween();
@@ -880,7 +890,7 @@ package ws.tink.spark.layouts.supportClasses
 				{
 					_indicesInLayout.push( i );
 				}
-					
+				
 				_numElementsInLayout = _indicesInLayout.length;
 				_numElementsNotInLayout = _indicesNotInLayout.length;
 				return;
@@ -998,14 +1008,14 @@ package ws.tink.spark.layouts.supportClasses
 			
 			if( target.numElements )
 			{
-//				updateSelectedIndex( Math.round( scrollPosition / indexMaxScroll ),
-//								( scrollPosition % indexMaxScroll > indexMaxScroll / 2 ) ? -( 1 - ( scrollPosition % indexMaxScroll ) / indexMaxScroll ) : ( scrollPosition % indexMaxScroll ) / indexMaxScroll );			
+				//				updateSelectedIndex( Math.round( scrollPosition / indexMaxScroll ),
+				//								( scrollPosition % indexMaxScroll > indexMaxScroll / 2 ) ? -( 1 - ( scrollPosition % indexMaxScroll ) / indexMaxScroll ) : ( scrollPosition % indexMaxScroll ) / indexMaxScroll );			
 				invalidateSelectedIndex( Math.round( scrollPosition / indexMaxScroll ),
 					( scrollPosition % indexMaxScroll > indexMaxScroll / 2 ) ? -( 1 - ( scrollPosition % indexMaxScroll ) / indexMaxScroll ) : ( scrollPosition % indexMaxScroll ) / indexMaxScroll );			
 			}
 			else
 			{
-//				updateSelectedIndex( -1, NaN );
+				//				updateSelectedIndex( -1, NaN );
 				invalidateSelectedIndex( -1, NaN );
 			}
 		}
@@ -1050,8 +1060,8 @@ package ws.tink.spark.layouts.supportClasses
 ////			invalidateTargetDisplayList();
 //		}
 		
-		private var _proposedSelectedIndex:int = -1;
-//		private var _proposedSelectedIndexOffset:Number = 0;;
+		private var _proposedSelectedIndex:int = -2;
+		//		private var _proposedSelectedIndexOffset:Number = 0;;
 		private var _selectedIndexInvalid:Boolean;
 		protected function invalidateSelectedIndex( index:int, offset:Number ):void
 		{
@@ -1078,7 +1088,7 @@ package ws.tink.spark.layouts.supportClasses
 		protected function invalidateTargetDisplayList() : void
 		{
 			if( !target ) return;
-
+			
 			target.invalidateDisplayList();
 		}
 		
@@ -1142,7 +1152,7 @@ package ws.tink.spark.layouts.supportClasses
 //			// AS THE INDEX HASN'T CHANGED
 ////			if( selectedIndex == -1 ) scrollPositionChanged();
 //		}
-		
+
 //		/**
 //		 *  @inheritDoc
 //		 *  
@@ -1174,7 +1184,7 @@ package ws.tink.spark.layouts.supportClasses
 		{
 			// When using virtualization, elements get created after updateElements()
 			// has been invoked as part of getVirtualItemAt(), therefore we must re-calculate them.
-			if( target is DataGroup && target.numChildren != _elements.length ) updateElements();
+			if( target is DataGroup && ( !_elements || target.numChildren != _elements.length ) ) updateElements();
 			
 			for each( var element:IVisualElement in _elements )
 			{
