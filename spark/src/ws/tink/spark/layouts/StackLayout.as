@@ -44,8 +44,8 @@ package ws.tink.spark.layouts
 	import spark.primitives.Rect;
 	import spark.utils.BitmapUtil;
 	
-	import ws.tink.spark.effects.stackEffects.StackEffect;
-	import ws.tink.spark.effects.stackEffects.effectInstances.StackEffectInstance;
+	import ws.tink.spark.effects.StackEffect;
+	import ws.tink.spark.effects.effectInstances.StackEffectInstance;
 	import ws.tink.spark.layouts.supportClasses.NavigatorLayoutBase;
 
 	use namespace mx_internal;

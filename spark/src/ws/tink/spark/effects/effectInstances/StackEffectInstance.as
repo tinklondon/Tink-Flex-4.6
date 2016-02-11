@@ -1,4 +1,4 @@
-package ws.tink.spark.effects.stackEffects.effectInstances
+package ws.tink.spark.effects.effectInstances
 {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -13,6 +13,7 @@ package ws.tink.spark.effects.stackEffects.effectInstances
 	import spark.effects.animation.Animation;
 	import spark.effects.animation.MotionPath;
 	import spark.effects.animation.SimpleMotionPath;
+	import spark.effects.interpolation.NumberInterpolator;
 	
 	import ws.tink.spark.controls.supportClasses.AnimationTarget;
 	
@@ -21,6 +22,8 @@ package ws.tink.spark.effects.stackEffects.effectInstances
 		public function StackEffectInstance(target:Object)
 		{
 			super( target );
+			
+			_element = GroupBase( target ); 
 			_uid = UIDUtil.createUID();
 			
 		}
@@ -30,6 +33,14 @@ package ws.tink.spark.effects.stackEffects.effectInstances
 		private var _numUpdateListeners:int;
 		private var _imageFrom:Image;
 		
+		private var _toDiff:Number;
+		private var _fromDiff:Number;
+		private var _element:GroupBase;
+		
+		public function get element():GroupBase 
+		{
+			return _element;
+		}
 		public function get imageFrom():Image 
 		{
 			return _imageFrom;
@@ -75,6 +86,184 @@ package ws.tink.spark.effects.stackEffects.effectInstances
 		}
 		
 		
+		//----------------------------------
+		//  fromStartFraction
+		//----------------------------------
+		
+		/**
+		 *  @private
+		 *  Storage for the fromStartFraction property.
+		 */
+		private var _fromStartFraction:Number = 0;
+		
+		/**
+		 *  
+		 *
+		 *  @default
+		 *  
+		 *  @langversion 3.0
+		 *  @playerversion Flash 10
+		 *  @playerversion AIR 1.5
+		 *  @productversion Flex 4
+		 */
+		public function get fromStartFraction():Number
+		{
+			return _fromStartFraction;
+		}
+		
+		/**
+		 *  @private
+		 */
+		public function set fromStartFraction( value:Number ):void
+		{
+			if( value == _fromStartFraction ) return;     
+			
+			_fromStartFraction = value; 
+		}
+		
+		
+		//----------------------------------
+		//  fromEndFraction
+		//----------------------------------
+		
+		/**
+		 *  @private
+		 *  Storage for the fromEndFraction property.
+		 */
+		private var _fromEndFraction:Number = 1;
+		
+		/**
+		 *  
+		 *
+		 *  @default
+		 *  
+		 *  @langversion 3.0
+		 *  @playerversion Flash 10
+		 *  @playerversion AIR 1.5
+		 *  @productversion Flex 4
+		 */
+		public function get fromEndFraction():Number
+		{
+			return _fromEndFraction;
+		}
+		
+		/**
+		 *  @private
+		 */
+		public function set fromEndFraction( value:Number ):void
+		{
+			if( value == _fromEndFraction ) return;     
+			
+			_fromEndFraction = value; 
+		}
+		
+		//----------------------------------
+		//  toStartFraction
+		//----------------------------------
+		
+		/**
+		 *  @private
+		 *  Storage for the toStartFraction property.
+		 */
+		private var _toStartFraction:Number = 0;
+		
+		/**
+		 *  
+		 *
+		 *  @default 1
+		 *  
+		 *  @langversion 3.0
+		 *  @playerversion Flash 10
+		 *  @playerversion AIR 1.5
+		 *  @productversion Flex 4
+		 */
+		public function get toStartFraction():Number
+		{
+			return _toStartFraction;
+		}
+		
+		/**
+		 *  @private
+		 */
+		public function set toStartFraction( value:Number ):void
+		{
+			if( value == _toStartFraction ) return;     
+			
+			_toStartFraction = value; 
+		}
+		
+		
+		//----------------------------------
+		//  toEndFraction
+		//----------------------------------
+		
+		/**
+		 *  @private
+		 *  Storage for the toEndFraction property.
+		 */
+		private var _toEndFraction:Number = 1;
+		
+		/**
+		 *  
+		 *
+		 *  @default 1
+		 *  
+		 *  @langversion 3.0
+		 *  @playerversion Flash 10
+		 *  @playerversion AIR 1.5
+		 *  @productversion Flex 4
+		 */
+		public function get toEndFraction():Number
+		{
+			return _toEndFraction;
+		}
+		
+		/**
+		 *  @private
+		 */
+		public function set toEndFraction( value:Number ):void
+		{
+			if( value == _toEndFraction ) return;     
+			
+			_toEndFraction = value; 
+		}
+		
+		
+		//----------------------------------
+		//  quality
+		//----------------------------------
+		
+		/**
+		 *  @private
+		 *  Storage for the quality property.
+		 */
+		private var _quality:uint;
+		
+		/**
+		 *  
+		 *
+		 *  @default
+		 *  
+		 *  @langversion 3.0
+		 *  @playerversion Flash 10
+		 *  @playerversion AIR 1.5
+		 *  @productversion Flex 4
+		 */
+		public function get quality():uint
+		{
+			return _quality;
+		}
+		
+		/**
+		 *  @private
+		 */
+		public function set quality( value:uint ):void
+		{
+			if( value == _quality ) return;     
+			
+			_quality = value; 
+		}
+		
 		/**
 		 *  @private
 		 *  Interrupts an effect that is currently playing,
@@ -101,7 +290,7 @@ package ws.tink.spark.effects.stackEffects.effectInstances
 			if (_animation)
 			{
 				_animation.end();
-				_animation = null;
+				//				_animation = null;
 			}
 			
 			super.end();
@@ -115,19 +304,23 @@ package ws.tink.spark.effects.stackEffects.effectInstances
 			_animationTarget.updateFunction = animationUpdate;
 			_animationTarget.endFunction = animationEnd;
 			
-			_animation = new Animation( 3000 );
+			_animation = new Animation( duration );
 			_animation.animationTarget = _animationTarget;
 			
 			display.visible = false;
 			
 			if( !_imageFrom )
 				_imageFrom = new Image();
-
+			
 			if( !_imageTo )
 				_imageTo = new Image();
 			
+			display.scaleX = display.scaleY = 1 / quality;
 			display.addElement( _imageFrom );
 			display.addElement( _imageTo );
+			
+			display.x = element.x;
+			display.y = element.y;
 			
 			_imageFrom.source = _bitmapFrom;
 			_imageFrom.validateNow();
@@ -136,7 +329,7 @@ package ws.tink.spark.effects.stackEffects.effectInstances
 			_imageTo.validateNow();
 			
 			initialize();
-			update( 0 );
+			update( 0, 0 );
 			
 			display.visible = true;
 			target.visible = false;
@@ -148,7 +341,10 @@ package ws.tink.spark.effects.stackEffects.effectInstances
 		
 		private function animationUpdate( animation:Animation ):void
 		{
-			update( animation.cycleFraction );
+			const from:Number = Math.max( 0, Math.min( 1, ( animation.cycleFraction - fromStartFraction ) / _fromDiff ) );
+			const to:Number = Math.max( 0, Math.min( 1, ( animation.cycleFraction - toStartFraction ) / _toDiff ) );
+			
+			update( from, to );
 			
 			if (_numUpdateListeners > 0)
 			{
@@ -186,10 +382,11 @@ package ws.tink.spark.effects.stackEffects.effectInstances
 		
 		protected function initialize():void
 		{
-			
+			_fromDiff = fromEndFraction - fromStartFraction;
+			_toDiff = toEndFraction - toStartFraction;
 		}
 		
-		protected function update( value:Number ):void
+		protected function update( from:Number, to:Number ):void
 		{
 		}
 		

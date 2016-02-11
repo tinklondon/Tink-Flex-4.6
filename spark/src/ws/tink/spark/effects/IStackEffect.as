@@ -1,4 +1,4 @@
-package ws.tink.spark.effects.stackEffects
+package ws.tink.spark.effects
 {
 	import flash.display.BitmapData;
 	
